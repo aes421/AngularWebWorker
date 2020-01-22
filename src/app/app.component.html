@@ -4,7 +4,10 @@
 <button (click)="generate()">Generate</button>
 
 <h3>Results</h3>
-{{output}}
+<ng-container *ngFor="let o of output">
+    {{o}}
+    <br />
+</ng-container>
 
 <br />
 

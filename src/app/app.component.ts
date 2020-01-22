@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AppService } from './app.service';
+import { generateFibonacciSequence } from './fib';
 
 @Component({
   selector: 'app-root',
@@ -8,18 +8,28 @@ import { AppService } from './app.service';
 })
 export class AppComponent {
   input = '';
-  output = '';
+  output = [];
   counter = 0;
 
-  constructor(public service: AppService) {
+  constructor() {
   }
 
   generate() {
-    this.output = '';
-    this.output = String(this.service.generateFibonacciSequence(Number(this.input)));
+
+    if (typeof Worker !== 'undefined') {
+      const worker = new Worker('./app.worker', { type: 'module' });
+      worker.onmessage = ({ data }) => {
+        this.output.push(data);
+        worker.terminate();
+      };
+      worker.postMessage(this.input);
+    } else {
+      this.output.push(generateFibonacciSequence(Number(this.input)));
+    }
   }
 
   count(amount: number) {
     this.counter += amount;
   }
 }
+
